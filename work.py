@@ -58,3 +58,19 @@ def stats(message, something):
     conn.commit()
     conn.close()
 
+@respond_to('user daystat (.*)')
+def daystats(message, something):
+    conn = sqlite3.connect('bot.db')
+    c = conn.cursor()
+    t = (something,datetime.now().date(),)
+    for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
+        date = ''.join(row[2])
+        if ''.join(row[1]) == "on":
+           onoff= "came to office"
+        else:
+           onoff= "left office"
+        htime=str (row[3])
+        mtime=str (row[4])
+        message.reply("user " + something + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+    conn.commit()
+    conn.close()
