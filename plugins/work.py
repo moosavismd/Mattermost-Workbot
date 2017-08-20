@@ -10,6 +10,7 @@ from time import gmtime, strftime
 from datetime import datetime
 from datetime import timedelta
 
+
 @respond_to('hi', re.IGNORECASE)
 def hi(message):
     message.reply('I can understand hi or HI!')
@@ -22,7 +23,11 @@ def love(message):
 
 @respond_to('work on')
 def coming(message):
-    message.send(message.get_username()+ " is working now ---- " + str (datetime.now()),'khio3dze8tdzujqmwhey1qacmy')
+    with open('channel.id', 'r') as f:
+        for line in f:
+            for word in line.split():
+                ch_id=word
+    message.send(message.get_username()+ " is working now ---- " + str (datetime.now()),ch_id)
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     t = (message.get_username(),'on',datetime.now().date(),datetime.now().hour,datetime.now().minute)
@@ -33,7 +38,11 @@ def coming(message):
 
 @respond_to('work off')
 def leaving(message):
-    message.send(message.get_username()+ " is out of work now ---- " + str (datetime.now()),'khio3dze8tdzujqmwhey1qacmy')
+    with open('channel.id', 'r') as f:
+        for line in f:
+            for word in line.split():
+                ch_id=word
+    message.send(message.get_username()+ " is out of work now ---- " + str (datetime.now()),ch_id)
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     t = (message.get_username(),'off',datetime.now().date(),datetime.now().hour,datetime.now().minute)
