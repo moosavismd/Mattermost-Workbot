@@ -30,8 +30,14 @@ def coming(message):
     message.send(message.get_username()+ " is working now ---- " + str (datetime.now()),ch_id)
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
-    t = (message.get_username(),'on',datetime.now().date(),datetime.now().hour,datetime.now().minute)
-    c.execute("INSERT INTO working VALUES (?,?,?,?,?)",t)
+    t = (message.get_username(), datetime.now().date(),)
+    c.execute('SELECT onoff FROM working WHERE user=? and date=? ORDER BY hdate DESC, mdate DESC LIMIT 1', t)
+    if ''.join(c.fetchone()) == "on":
+        message.reply("you have already registered your entrance today")
+    else:
+        message.reply("Hello " + message.get_username() + " ! get ready for a good day :) !")
+        t = (message.get_username(), 'on', datetime.now().date(), datetime.now().hour, datetime.now().minute)
+        c.execute("INSERT INTO working VALUES (?,?,?,?,?)", t)
     conn.commit()
     conn.close()
 
@@ -45,8 +51,14 @@ def leaving(message):
     message.send(message.get_username()+ " is out of work now ---- " + str (datetime.now()),ch_id)
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
-    t = (message.get_username(),'off',datetime.now().date(),datetime.now().hour,datetime.now().minute)
-    c.execute("INSERT INTO working VALUES (?,?,?,?,?)",t)
+    t = (message.get_username(), datetime.now().date(),)
+    c.execute('SELECT onoff FROM working WHERE user=? and date=? ORDER BY hdate DESC, mdate DESC LIMIT 1', t)
+    if ''.join(c.fetchone()) == "off":
+        message.reply("you have already registered your exit today")
+    else:
+        message.reply("Thanks for your hard work " + message.get_username() + " ! have a good day :) see you soon !")
+        t = (message.get_username(), 'off', datetime.now().date(), datetime.now().hour, datetime.now().minute)
+        c.execute("INSERT INTO working VALUES (?,?,?,?,?)",t)
     conn.commit()
     conn.close()
 
