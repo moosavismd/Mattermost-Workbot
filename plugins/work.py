@@ -119,7 +119,7 @@ def weekstats(message, something):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     sumall =0
-    for i in range (0,7):
+    for i in range (1,8):
         dayon = 0
         dayoff = 0
         t = (something,datetime.now().date() - timedelta(days=i),)
@@ -148,7 +148,7 @@ def monthstats(message, something):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     sumall = 0
-    for i in range (0,30):
+    for i in range (1,31    ):
         dayon = 0
         dayoff = 0
         t = (something,datetime.now().date() - timedelta(days=i),)
