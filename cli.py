@@ -17,7 +17,7 @@ def main():
         fd = os.open('/usr/local/lib/python2.7/dist-packages/mattermost_bot/plugins/bot.db', os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         conn = sqlite3.connect('/usr/local/lib/python2.7/dist-packages/mattermost_bot/plugins/bot.db')
         c = conn.cursor()
-        c.execute('''CREATE TABLE working (user,onoff,date,hdate,mdate)''')
+        c.execute('''CREATE TABLE working (user,onoff,date,htime,mtime)''')
         conn.commit()
         conn.close()
     try:
