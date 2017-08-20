@@ -57,6 +57,8 @@ def leaving(message):
     response = c.fetchone()
     if response and ''.join(response) == "off":
         message.reply("you have already registered your exit today")
+    elif not response:
+        message.reply("you didn't register your entrance today!")
     else:
         message.send(message.get_username() + " is out of work now ---- " + str(datetime.now()), ch_id)
         message.reply("Thanks for your hard work " + message.get_username() + " ! have a good day :) see you soon !")
@@ -74,12 +76,12 @@ def stats(message, something):
     t = (something,)
     for row in c.execute('SELECT * FROM working WHERE user=?', t):
         date = ''.join(row[2])
-        if ''.join(row[1]) == "on":
-           onoff= "came to office"
-        else:
-           onoff= "left office"
         htime=str (row[3])
         mtime=str (row[4])
+        if ''.join(row[1]) == "on":
+            onoff= "came to office"
+        else:
+            onoff= "left office"
         message.reply("user " + something +" " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
     conn.commit()
     conn.close()
@@ -89,51 +91,83 @@ def daystats(message, something):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     t = (something,datetime.now().date(),)
+    dayon = 0
+    dayoff = 0
     for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
         date = ''.join(row[2])
-        if ''.join(row[1]) == "on":
-           onoff= "came to office"
-        else:
-           onoff= "left office"
         htime=str (row[3])
         mtime=str (row[4])
+        if ''.join(row[1]) == "on":
+            dayon = dayon + row[4] + (row[3] * 60)
+            onoff= "came to office"
+        else:
+            dayoff = dayoff + row[4] + (row[3] * 60)
+            onoff= "left office"
         message.reply("user " + something + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+    if dayoff < dayon:
+        dayoff= dayoff + datetime.now().minute + datetime.now().hour*60
+    sumall = dayoff - dayon
     conn.commit()
     conn.close()
+    sumhours = sumall / 60
+    summinutes = sumall % 60
+    message.reply("user " + something + " totally worked " + str (sumhours) + ":" + str(summinutes) + " today.")
 
 
 @respond_to('user week stat (.*)')
 def weekstats(message, something):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
+    sumall =0
     for i in range (0,7):
-      t = (something,datetime.now().date() - timedelta(days=i),)
-      for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
-          date = ''.join(row[2])
-          if ''.join(row[1]) == "on":
-             onoff= "came to office"
-          else:
-             onoff= "left office"
-          htime=str (row[3])
-          mtime=str (row[4])
-          message.reply("user " + something + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+        dayon = 0
+        dayoff = 0
+        t = (something,datetime.now().date() - timedelta(days=i),)
+        for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
+            date = ''.join(row[2])
+            htime=str (row[3])
+            mtime=str (row[4])
+            if ''.join(row[1]) == "on":
+                dayon = dayon + row[4] + (row[3] * 60)
+                onoff = "came to office"
+            else:
+                dayoff = dayoff + row[4] + (row[3] * 60)
+                onoff = "left office"
+            message.reply("user " + something + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+        if dayoff < dayon:
+            dayoff = dayoff+1320
+        sumall = sumall + (dayoff - dayon)
     conn.commit()
     conn.close()
+    sumhours = sumall / 60
+    summinutes = sumall % 60
+    message.reply("user " + something + " totally worked " + str (sumhours) + ":" + str(summinutes) + " in last 7 days.")
 
 @respond_to('user month stat (.*)')
 def monthstats(message, something):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
+    sumall = 0
     for i in range (0,30):
-      t = (something,datetime.now().date() - timedelta(days=i),)
-      for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
-          date = ''.join(row[2])
-          if ''.join(row[1]) == "on":
-             onoff= "came to office"
-          else:
-             onoff= "left office"
-          htime=str (row[3])
-          mtime=str (row[4])
-          message.reply("user " + something + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+        dayon = 0
+        dayoff = 0
+        t = (something,datetime.now().date() - timedelta(days=i),)
+        for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
+            date = ''.join(row[2])
+            htime=str (row[3])
+            mtime=str (row[4])
+            if ''.join(row[1]) == "on":
+                dayon = dayon + row[4] + (row[3] * 60)
+                onoff = "came to office"
+            else:
+                dayoff = dayoff + row[4] + (row[3] * 60)
+                onoff = "left office"
+            message.reply("user " + something + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+        if dayoff < dayon:
+            dayoff = dayoff + 1320
+        sumall = sumall + (dayoff - dayon)
     conn.commit()
     conn.close()
+    sumhours = sumall / 60
+    summinutes = sumall % 60
+    message.reply("user " + something + " totally worked " + str (sumhours) + ":" + str(summinutes) + " in last 30 days.")
