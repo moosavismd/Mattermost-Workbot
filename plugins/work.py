@@ -171,3 +171,44 @@ def monthstats(message, something):
     sumhours = sumall / 60
     summinutes = sumall % 60
     message.reply("user " + something + " totally worked " + str (sumhours) + ":" + str(summinutes) + " in last 30 days.")
+
+@respond_to('my week stat')
+def weekstats(message):
+    conn = sqlite3.connect('bot.db')
+    c = conn.cursor()
+    sumall =0
+    for i in range (0,datetime.today().weekday()+1):
+        dayon = 0
+        dayoff = 0
+        t = (message.get_username(),datetime.now().date() - timedelta(days=i),)
+        for row in c.execute('SELECT * FROM working WHERE user=? and date=?', t):
+            date = ''.join(row[2])
+            htime=str (row[3])
+            mtime=str (row[4])
+            if i != 0:
+                if ''.join(row[1]) == "on":
+                    dayon = dayon + row[4] + (row[3] * 60)
+                    onoff = "came to office"
+                else:
+                    dayoff = dayoff + row[4] + (row[3] * 60)
+                    onoff = "left office"
+                message.reply("user " + message.get_username() + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+                if dayoff < dayon:
+                    dayoff = dayoff+1320
+            else:
+                if ''.join(row[1]) == "on":
+                    dayon = dayon + row[4] + (row[3] * 60)
+                    onoff = "came to office"
+                else:
+                    dayoff = dayoff + row[4] + (row[3] * 60)
+                    onoff = "left office"
+                message.reply("user " + message.get_username() + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
+                if dayoff < dayon:
+                    dayoff= dayoff + datetime.now().minute + datetime.now().hour*60
+        sumall = sumall + (dayoff - dayon)
+    conn.commit()
+    conn.close()
+    sumhours = sumall / 60
+    summinutes = sumall % 60
+    message.reply("user " + message.get_username() + " totally worked " + str (sumhours) + ":" + str(summinutes) + " in last 7 days.")
+
