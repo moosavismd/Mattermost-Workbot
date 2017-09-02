@@ -10,10 +10,8 @@ from time import gmtime, strftime
 from datetime import datetime
 from datetime import timedelta
 
-
 @respond_to('hi', re.IGNORECASE)
 def hi(message):
-    message.reply('I can understand hi or HI!')
 
 
 @respond_to('I love you')
@@ -177,7 +175,7 @@ def weekstats(message):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     sumall =0
-    for i in range (0,datetime.today().weekday()+3):
+    for i in range (0,(datetime.today().weekday()+3)%7):
         dayon = 0
         dayoff = 0
         t = (message.get_username(),datetime.now().date() - timedelta(days=i),)
