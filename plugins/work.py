@@ -190,7 +190,7 @@ def weekstats(message):
                 dayoff = dayoff + row[4] + (row[3] * 60)
                 onoff = "left office"
             message.reply("user " + message.get_username() + " " + onoff + " at " + htime + " : " + mtime + " in " +date + ".")
-        if i == 0: 
+        if i == 0:
             if dayoff < dayon:
                 dayoff= dayoff + datetime.now().minute + datetime.now().hour*60
         else:
